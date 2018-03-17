@@ -3,36 +3,39 @@ services:
   postgres:
     image: "postgres:9.6-alpine"
     networks:
-      - back
+      - factycznie-network
     volumes:
       - postgres-data:/var/lib/postgresql/data
   redis:
     image: redis:alpine
     networks:
-      - back
+      - factycznie-network
     volumes:
       - redis-data:/data
   elasticsearch:
     image: "elasticsearch:2.4-alpine"
-    ports:
-      - "9200"
     networks:
-      - back
+      - factycznie-network
+#    ports:
+#      - "9200"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
   nginx:
     image: "nginx:latest"
+    networks:
+      - factycznie-network
     ports:
-      - "8000:8000"
-      - "5000:5000"
-    network_mode: bridge
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/mime.types:/etc/nginx/mime.types
   backend:
     image: "factycznie_backend:latest"
-    ports:
-      - "8000"
+    networks:
+      - factycznie-network
+#    ports:
+#      - "8000"
     environment:
       - "POSTGRES_PORT_5432_TCP_PORT=5432"
       - "POSTGRES_PORT_5432_TCP_ADDR=postgres"
@@ -40,21 +43,16 @@ services:
       - "ELASTIC_USERNAME=elastic"
       - "ELASTIC_PASSWORD=changeme"
       - "DJANGO_SETTINGS_MODULE=factcoin.settings.production"
-    networks:
-      - front
-      - back
   frontend:
     image: "factycznie_frontend:latest"
-    ports:
-      - "5000"
     networks:
-      - front
+      - factycznie-network
+#    ports:
+#      - "5000"
 volumes:
   redis-data:
   postgres-data:
   elasticsearch-data:
 networks:
-  front:
-    driver: "bridge"
-  back:
+  factycznie-network:
     driver: "bridge"
