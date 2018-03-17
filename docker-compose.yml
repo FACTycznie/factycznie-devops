@@ -31,7 +31,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/mime.types:/etc/nginx/mime.types
   backend:
-    image: "factycznie_backend:latest"
+    image: "factycznie/factycznie_backend:latest"
     networks:
       - factycznie-network
 #    ports:
@@ -44,7 +44,7 @@ services:
       - "ELASTIC_PASSWORD=changeme"
       - "DJANGO_SETTINGS_MODULE=factcoin.settings.production"
   frontend:
-    image: "factycznie_frontend:latest"
+    image: "factycznie/factycznie_frontend:latest"
     networks:
       - factycznie-network
 #    ports:
