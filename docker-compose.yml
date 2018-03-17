@@ -2,28 +2,20 @@ version: '3'
 services:
   postgres:
     image: "postgres:9.6-alpine"
-    networks:
-      - factycznie-network
     volumes:
       - postgres-data:/var/lib/postgresql/data
   redis:
     image: redis:alpine
-    networks:
-      - factycznie-network
     volumes:
       - redis-data:/data
   elasticsearch:
     image: "elasticsearch:2.4-alpine"
-    networks:
-      - factycznie-network
 #    ports:
 #      - "9200"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
   nginx:
     image: "nginx:latest"
-    networks:
-      - factycznie-network
     ports:
       - "80:80"
       - "443:443"
@@ -53,6 +45,3 @@ volumes:
   redis-data:
   postgres-data:
   elasticsearch-data:
-networks:
-  factycznie-network:
-    driver: "bridge"
