@@ -3,13 +3,13 @@ services:
   postgres:
     image: "postgres:9.6-alpine"
     networks:
-      - factcoin-net
+      - back
     volumes:
       - postgres-data:/var/lib/postgresql/data
   redis:
     image: redis:alpine
     networks:
-      - factcoin-net
+      - back
     volumes:
       - redis-data:/data
   elasticsearch:
@@ -17,13 +17,22 @@ services:
     ports:
       - "9200"
     networks:
-      - factcoin-net
+      - back
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
-  factcoin:
-    image: "factcoin/factcoin:latest"
+  nginx:
+    image: "nginx:latest"
     ports:
-      - "80:8000"
+      - "8000:8000"
+      - "5000:5000"
+    network_mode: bridge
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./nginx/mime.types:/etc/nginx/mime.types
+  backend:
+    image: "factycznie_backend:latest"
+    ports:
+      - "8000"
     environment:
       - "POSTGRES_PORT_5432_TCP_PORT=5432"
       - "POSTGRES_PORT_5432_TCP_ADDR=postgres"
@@ -32,10 +41,20 @@ services:
       - "ELASTIC_PASSWORD=changeme"
       - "DJANGO_SETTINGS_MODULE=factcoin.settings.production"
     networks:
-      - factcoin-net
+      - front
+      - back
+  frontend:
+    image: "factycznie_frontend:latest"
+    ports:
+      - "5000"
+    networks:
+      - front
 volumes:
   redis-data:
   postgres-data:
   elasticsearch-data:
 networks:
-  factcoin-net:
+  front:
+    driver: "bridge"
+  back:
+    driver: "bridge"
